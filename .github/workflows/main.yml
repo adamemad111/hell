@@ -26,7 +26,7 @@ jobs:
 
       - name: Run Yellow Pages scraper
         run: |
-          python scrape_yellow_pages.py
+          python yellow-pages.py
 
       - name: Upload output files
         if: success()
