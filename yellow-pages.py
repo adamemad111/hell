@@ -316,7 +316,7 @@ def process_hardcoded_file(file_path, column_name):
     # Extract relevant columns
     urls = data[column_name].dropna().tolist()[99:150]
     industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[99:150]
-    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[99:159]
+    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[99:150]
 
     # Process each URL
     for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=100):
