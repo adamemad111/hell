@@ -28,7 +28,7 @@ jobs:
 
     - name: Run web scraper
       run: |
-        python scraper_file.py
+        python yellowpages.py
 
     - name: Upload output files
       uses: actions/upload-artifact@v3
