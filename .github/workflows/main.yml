@@ -1,39 +1,45 @@
-name: Run Yellow Pages Scraper
+name: Run Web Scraper
 
 on:
-  workflow_dispatch: # Allows manual triggering of the workflow
-  push:
-    branches:
-      - main  # Run the workflow when code is pushed to the main branch
+  workflow_dispatch:
+    inputs:
+      excel_file:
+        description: 'Excel file to process (default: chunk_1.xlsx)'
+        default: 'chunk_1.xlsx'
+        required: false
 
 jobs:
-  run-scraper:
+  webscraper:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pandas requests beautifulsoup4 aiohttp openpyxl
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas requests beautifulsoup4 aiohttp openpyxl
 
-      - name: Run Yellow Pages scraper
-        run: python yellow-pages.py
+    - name: Run web scraper
+      run: |
+        python scraper_file.py
 
-      - name: Debug
-        run: ls -R
+    - name: Upload output files
+      uses: actions/upload-artifact@v3
+      with:
+        name: output-files
+        path: "*.csv"
 
-      - name: Upload output files
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: scraped-data
-          path: |
-            **/*.csv # Matches all CSV files in any directory
+    - name: Push output to repository
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@users.noreply.github.com"
+        git add *.csv
+        git commit -m "Add scraped output files"
+        git push
