@@ -5,7 +5,7 @@ on:
     inputs:
       excel_file:
         description: 'Excel file to process (default: chunk_1.xlsx)'
-        default: 'chunk_1.xlsx'
+        default: 'Yellow Pages Phase 1 Links.xlsx'
         required: false
 
 jobs:
