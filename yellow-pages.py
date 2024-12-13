@@ -265,7 +265,6 @@ def scrape_urls_async(urls):
     results = loop.run_until_complete(asyncio.gather(*tasks))
     return [item for sublist in results for item in sublist]
 
-# Save data to CSV
 def save_to_csv(data, industry, job_title, sheet_name, location, file_name='output.csv'):
     try:
         for row in data:
@@ -277,9 +276,10 @@ def save_to_csv(data, industry, job_title, sheet_name, location, file_name='outp
         # Clean the 'Website' column by removing any text in parentheses
         if 'Website' in df.columns:
             df['Website'] = df['Website'].apply(lambda x: re.sub(r'\s*\(.*\)\s*', '', str(x)))
-        # Reorder columns to place Email and Website next to Phone
+
+        # Define the column order, ensuring Industry and Job Title are at the beginning
         column_order = [
-            'Business Name', 'Link', 'Phone', 'Email', 'Website', 
+            'Industry', 'Job Title', 'Business Name', 'Link', 'Phone', 'Email', 'Website', 
             'Street', 'Suburb', 'State', 'Postcode', 'Full Location',
             'Category', 'About Us', 'Products and Services'
         ]
@@ -295,6 +295,7 @@ def save_to_csv(data, industry, job_title, sheet_name, location, file_name='outp
         print(f"Data saved to {file_name}")
     except Exception as e:
         print(f"Error saving to CSV: {e}")
+
 
 # Function to process a single file
 def process_hardcoded_file(file_path, column_name):
@@ -338,6 +339,6 @@ def process_hardcoded_file(file_path, column_name):
 
 
 # Example usage
-excel_file = "chunk_1.xlsx"
+excel_file = "Yellow Pages Phase 1 Links.xlsx"
 url_column = "Yellow Pages Links"
 process_hardcoded_file(excel_file, url_column)
