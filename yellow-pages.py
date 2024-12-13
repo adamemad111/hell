@@ -315,11 +315,11 @@ def process_hardcoded_file(file_path, column_name):
 
     # Extract relevant columns
     urls = data[column_name].dropna().tolist()[46:100]
-    industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[46:100]
-    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[46:100]
+    industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[46:47]
+    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[46:47]
 
     # Process each URL
-    for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=47):
+    for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=46):
         print(f"Processing URL {idx}/{len(urls)}: {url}")
 
         clue_match = re.search(r'clue=([^&]*)', url)  # Extract the 'clue' value
