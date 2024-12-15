@@ -319,20 +319,19 @@ def process_hardcoded_file(file_path, column_name):
     job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[0:50]
 
     # Process each URL
-    for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=1):
+    for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=250):
         print(f"Processing URL {idx}/{len(urls)}: {url}")
 
-        clue_value = re.search(r'clue=([^&]*)', url).group(1) if re.search(r'clue=([^&]*)', url) else ''  # Extract the 'clue' value
+        clue_match = re.search(r'clue=([^&]*)', url)  # Extract the 'clue' value
         location_match = re.search(r'locationClue=([^&]*)', url)  # Extract the 'locationClue' value
-        clue = clue_value.group(1).replace('+', ' ') if clue_match else "Unknown_Clue"
+        clue = clue_match.group(1).replace('+', ' ') if clue_match else "Unknown_Clue"
         location = location_match.group(1).replace('+', ' ') if location_match else "Unknown_Location"
 
         # Prepare sanitized output filename
-        invalid_chars = r'[<>:"/\\|?*\r\n]'
-        sanitized_clue = re.sub(invalid_chars, '', clue_value).replace(' ', '_')
-        sanitized_location = re.sub(invalid_chars, '', location_value).replace(' ', '_')
+        sanitized_clue = re.sub(r'[^\w\s-]', '', clue).replace(' ', '_')[:]
+        sanitized_location = re.sub(r'[^\w\s-]', '', location).replace(' ', '_')[:30]
 
-        output_file = f"{industry}+{job_title}+{clue_value}+{sanitized_location}.csv"
+        output_file = f"{industry}+{job_title}+{clue_match}+{sanitized_location}.csv"
 
         # Scrape the URL and save results
         data = scrape_urls_async([url])  # Use your existing async scraping logic
