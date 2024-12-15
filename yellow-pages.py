@@ -322,7 +322,7 @@ def process_hardcoded_file(file_path, column_name):
     for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=250):
         print(f"Processing URL {idx}/{len(urls)}: {url}")
 
-        clue_match = re.search(r'clue=([^&]*)', url)  # Extract the 'clue' value
+        clue_value = re.search(r'clue=([^&]*)', url).group(1) if re.search(r'clue=([^&]*)', url) else ''  # Extract the 'clue' value
         location_match = re.search(r'locationClue=([^&]*)', url)  # Extract the 'locationClue' value
         clue = clue_match.group(1).replace('+', ' ') if clue_match else "Unknown_Clue"
         location = location_match.group(1).replace('+', ' ') if location_match else "Unknown_Location"
