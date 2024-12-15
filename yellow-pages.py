@@ -324,12 +324,13 @@ def process_hardcoded_file(file_path, column_name):
 
         clue_value = re.search(r'clue=([^&]*)', url).group(1) if re.search(r'clue=([^&]*)', url) else ''  # Extract the 'clue' value
         location_match = re.search(r'locationClue=([^&]*)', url)  # Extract the 'locationClue' value
-        clue = clue_match.group(1).replace('+', ' ') if clue_match else "Unknown_Clue"
+        clue = clue_value.group(1).replace('+', ' ') if clue_match else "Unknown_Clue"
         location = location_match.group(1).replace('+', ' ') if location_match else "Unknown_Location"
 
         # Prepare sanitized output filename
-        sanitized_clue = re.sub(r'[^\w\s-]', '', clue).replace(' ', '_')[:30]
-        sanitized_location = re.sub(r'[^\w\s-]', '', location).replace(' ', '_')[:30]
+        invalid_chars = r'[<>:"/\\|?*\r\n]'
+        sanitized_clue = re.sub(invalid_chars, '', clue_value).replace(' ', '_')
+        sanitized_location = re.sub(invalid_chars, '', location_value).replace(' ', '_')
 
         output_file = f"{industry}+{job_title}+{clue_value}+{sanitized_location}.csv"
 
