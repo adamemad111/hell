@@ -331,7 +331,7 @@ def process_hardcoded_file(file_path, column_name):
         sanitized_clue = re.sub(r'[^\w\s-]', '', clue).replace(' ', '_')[:30]
         sanitized_location = re.sub(r'[^\w\s-]', '', location).replace(' ', '_')[:30]
 
-        output_file = f"{industry}+{job_title}+{clue_match}+{sanitized_location}.csv"
+        output_file = f"{industry}+{job_title}+{clue_value}+{sanitized_location}.csv"
 
         # Scrape the URL and save results
         data = scrape_urls_async([url])  # Use your existing async scraping logic
