@@ -314,12 +314,12 @@ def process_hardcoded_file(file_path, column_name):
         return
 
     # Extract relevant columns
-    urls = data[column_name].dropna().tolist()[1099:1150]
-    industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[1099:1150]
-    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[1099:1150]
+    urls = data[column_name].dropna().tolist()[1149:1200]
+    industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[1149:1200]
+    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[1149:1200]
 
     # Process each URL
-    for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=1100):
+    for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=1150):
         print(f"Processing URL {idx}/{len(urls)}: {url}")
 
         clue_match = re.search(r'clue=([^&]*)', url)  # Extract the 'clue' value
