@@ -324,9 +324,9 @@ def process_hardcoded_file(file_path, column_name):
         return
 
     # Extract relevant columns
-    urls = data[column_name].dropna().tolist()[0:10]
-    industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[0:10]
-    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[0:10]
+    urls = data[column_name].dropna().tolist()[0:100]
+    industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[0:100]
+    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[0:100]
     # Process each URL
     for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=1):
         print(f"Processing URL {idx}/{len(urls)}: {url}")
