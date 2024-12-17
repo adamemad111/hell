@@ -9,27 +9,28 @@ import asyncio
 
 # Function to extract all contact details with correct formatting
 def extract_contact_details(soup):
-    try: 
+    try:
         contact_container = soup.select_one('div.primary-contacts-container')
-        if not contact_container: 
+        if not contact_container:
             return 'No contact details found'
-        
+
         contacts = []
-        # Extract all contact methods from div.contact and a.contact
         contact_methods = contact_container.select('div.contact, a.contact')
 
         for method in contact_methods:
             contact_type = method.get('title', 'Unknown').strip()
             contact_value = method.select_one('div.desktop-display-value')
 
-            if contact_value:
+            # Handle specific contact types
+            if 'website' in contact_type.lower():
+                website_link = method.get('href', '')
+                if website_link:
+                    contacts.append(f"Website: {website_link}")
+            elif contact_value:
                 contact_value_text = contact_value.get_text(strip=True)
-                
-                # Handle special cases for email and website
                 if contact_type.lower() == 'fax':
                     contacts.append(f"Fax: {contact_value_text}")
                 elif 'email' in contact_type.lower():
-                    # Extract email from the title attribute
                     email_address = method.get('title', '').split(' ')[-1]
                     if email_address:
                         contacts.append(f"Email: {email_address}")
@@ -37,7 +38,14 @@ def extract_contact_details(soup):
                     contacts.append(f"Phone: {contact_value_text}")
                 else:
                     contacts.append(f"{contact_value_text}: {contact_type}")
-        
+
+        # Fallback for directly nested <a> tags with website links
+        website_links = contact_container.select('a.contact-url')
+        for link in website_links:
+            website_link = link.get('href', '').strip()
+            if website_link:
+                contacts.append(f"Website: {website_link}")
+
         return '; '.join(contacts) if contacts else 'No contact details found'
     except Exception as e:
         return f"Error occurred: {e}"
