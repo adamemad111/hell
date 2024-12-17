@@ -276,7 +276,6 @@ def scrape_urls_async(urls):
 import pandas as pd
 import re
 
-# Define the save_to_csv function
 def save_to_csv(data, industry, job_title, sheet_name, location, file_name='output.csv'):
     try:
         for row in data:
@@ -288,22 +287,6 @@ def save_to_csv(data, industry, job_title, sheet_name, location, file_name='outp
         # Clean the 'Website' column by removing any text in parentheses
         if 'Website' in df.columns:
             df['Website'] = df['Website'].apply(lambda x: re.sub(r'\s*\(.*\)\s*', '', str(x)))
-
-        # Add websites based on emails where applicable
-        def extract_website(email):
-            if not isinstance(email, str):
-                return None
-            domain = email.split('@')[-1].lower()
-            common_invalid_domains = ["bigpond.com", "gmail.com", "yahoo.com", "hotmail.com", "aol.com", "outlook.com"]
-            if domain in common_invalid_domains or domain.count('.') < 1:
-                return None
-            return f"http://www.{domain}"
-
-        if 'Email' in df.columns and 'Website' in df.columns:
-            df['Website'] = df.apply(
-                lambda row: extract_website(row['Email']) if pd.isna(row['Website']) and isinstance(row['Email'], str) else row['Website'],
-                axis=1
-            )
 
         # Define the column order, ensuring Industry and Job Title are at the beginning
         column_order = [
@@ -323,9 +306,7 @@ def save_to_csv(data, industry, job_title, sheet_name, location, file_name='outp
         print(f"Data saved to {file_name}")
     except Exception as e:
         print(f"Error saving to CSV: {e}")
-
-
-
+        
 # Function to process a single file
 def process_hardcoded_file(file_path, column_name):
     print(f"Processing file: {file_path}")
