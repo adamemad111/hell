@@ -157,24 +157,24 @@ def parse_business_data(soup):
 def split_contact_details_dynamic(row):
     details = row.get("Contact Details", "")
     contact_types = {}
-    
+
     for detail in details.split(';'):
         detail = detail.strip()
         if ':' in detail:
             key, value = detail.split(':', 1)
             contact_types[key.strip()] = value.strip()
-    
+
     return pd.Series(contact_types)
 
 def split_location(location):
     # If no location is found, return all parts as 'N/A'
     if location == 'No location found' or pd.isna(location):
         return ['N/A', 'N/A', 'N/A', 'N/A']
-    
+
     # Regular expression for handling full address (Street, Suburb, State, Postcode)
     location_pattern = r'^(.*?),\s*([A-Za-z\s]+)\s+([A-Za-z]{2,3})\s*(\d{4})$'
     match = re.match(location_pattern, location.strip())
-    
+
     if match:
         # If full address is matched, return all parts
         street = match.group(1).strip()
@@ -182,35 +182,35 @@ def split_location(location):
         state = match.group(3).strip()
         postcode = match.group(4).strip()
         return [street, suburb, state, postcode]
-    
+
     # Handle case where only Suburb, State, and Postcode are provided (no Street)
     location_pattern_no_street = r'^[A-Za-z\s]+,\s*([A-Za-z\s]+)\s+([A-Za-z]{2,3})\s*(\d{4})$'
     match_no_street = re.match(location_pattern_no_street, location.strip())
-    
+
     if match_no_street:
         suburb = match_no_street.group(1).strip()
         state = match_no_street.group(2).strip()
         postcode = match_no_street.group(3).strip()
         return ['N/A', suburb, state, postcode]
-    
+
     # Handle case where only Suburb and State are present (missing Postcode)
     location_pattern_suburb_state = r'^[A-Za-z\s]+,\s*([A-Za-z\s]+)\s+([A-Za-z]{2,3})$'
     match_suburb_state = re.match(location_pattern_suburb_state, location.strip())
-    
+
     if match_suburb_state:
         suburb = match_suburb_state.group(1).strip()
         state = match_suburb_state.group(2).strip()
         return ['N/A', suburb, state, 'N/A']
-    
+
     # Handle case where only Suburb and Postcode are present (missing State)
     location_pattern_suburb_postcode = r'^[A-Za-z\s]+,\s*([A-Za-z\s]+)\s*(\d{4})$'
     match_suburb_postcode = re.match(location_pattern_suburb_postcode, location.strip())
-    
+
     if match_suburb_postcode:
         suburb = match_suburb_postcode.group(1).strip()
         postcode = match_suburb_postcode.group(2).strip()
         return ['N/A', suburb, 'N/A', postcode]
-    
+
     # If none of the patterns match, return the location as Street and N/A for others
     return ["N/A", 'N/A', 'N/A', 'N/A']
 
@@ -221,7 +221,7 @@ def fetch_page_soup(url):
     else:
         print(f"Failed to fetch {url}: Status code {response.status_code}")
         return None
-    
+
 # Fetch and parse pages asynchronously
 async def scrape_pages_async(base_url):
     all_data = []
@@ -237,7 +237,7 @@ async def scrape_pages_async(base_url):
 
             # Look for the div with display="flex" that contains the "Next" button
             next_button_div = soup.find('div', {'display': 'flex'})
-            
+
             if next_button_div:
                 # Within that div, look for the "Next" button with the text "Next"
                 next_button = next_button_div.find('span', class_='MuiButton-label', string="Next")
@@ -306,14 +306,14 @@ def save_to_csv(data, industry, job_title, sheet_name, location, file_name='outp
         print(f"Data saved to {file_name}")
     except Exception as e:
         print(f"Error saving to CSV: {e}")
-        
-# Function to process the second sheet (Retail & Services for part jobs)
-def process_retail_services_part_jobs(file_path, sheet_name):
+
+# Function to process a single file
+def process_hardcoded_file(file_path, column_name):
     print(f"Processing file: {file_path}")
 
     try:
-        # Read the second sheet
-        data = pd.read_excel(file_path, sheet_name=sheet_name)
+        # Read the file
+        data = pd.read_excel(file_path)
     except Exception as e:
         print(f"Failed to read file {file_path}: {e}")
         return
@@ -324,11 +324,14 @@ def process_retail_services_part_jobs(file_path, sheet_name):
         return
 
     # Extract relevant columns
+    urls = data[column_name].dropna().tolist()[1099:1200]
+    industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[1099:1200]
+    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[1099:1200]
     urls = data[column_name].dropna().tolist()[1199:1322]
     industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[1199:1322]
     job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[1199:1322]
-    
     # Process each URL
+    for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=1100):
     for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=1200):
         print(f"Processing URL {idx}/{len(urls)}: {url}")
 
@@ -347,8 +350,8 @@ def process_retail_services_part_jobs(file_path, sheet_name):
         data = scrape_urls_async([url])  # Use your existing async scraping logic
         save_to_csv(data, industry, job_title, file_path, location, file_name=output_file)
 
-# Example usage for Retail & Services for part jobs sheet
-excel_file = "Yellow Pages Phase 1 Links.xlsx"
-sheet_name = "Retail & Services for part jobs"  # The second sheet name
-process_retail_services_part_jobs(excel_file, sheet_name)
 
+# Example usage
+excel_file = "Yellow Pages Phase 1 Links.xlsx"
+url_column = "Yellow Pages Links"
+process_hardcoded_file(excel_file, url_column)
