@@ -307,17 +307,17 @@ def save_to_csv(data, industry, job_title, sheet_name, location, file_name='outp
     except Exception as e:
         print(f"Error saving to CSV: {e}")
         
-# Function to process the second sheet (Retail & Services for part jobs)
-def process_retail_services_part_jobs(file_path, sheet_name):
+# Function to process a single file
+def process_hardcoded_file(file_path, column_name):
     print(f"Processing file: {file_path}")
 
     try:
-        # Read the second sheet
-        data = pd.read_excel(file_path, sheet_name=sheet_name)
+        # Read the file
+        data = pd.read_excel(file_path)
     except Exception as e:
         print(f"Failed to read file {file_path}: {e}")
         return
-    column_name = "Yellow Pages Phase 1 Links"
+
     # Ensure the required column exists
     if column_name not in data.columns:
         print(f"Column '{column_name}' not found in file '{file_path}'.")
@@ -327,7 +327,6 @@ def process_retail_services_part_jobs(file_path, sheet_name):
     urls = data[column_name].dropna().tolist()[1199:1322]
     industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[1199:1322]
     job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[1199:1322]
-    
     # Process each URL
     for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=1200):
         print(f"Processing URL {idx}/{len(urls)}: {url}")
@@ -347,7 +346,8 @@ def process_retail_services_part_jobs(file_path, sheet_name):
         data = scrape_urls_async([url])  # Use your existing async scraping logic
         save_to_csv(data, industry, job_title, file_path, location, file_name=output_file)
 
-# Example usage for Retail & Services for part jobs sheet
+
+# Example usage
 excel_file = "Yellow Pages Phase 1 Links.xlsx"
-sheet_name = "Retail & Services for part jobs"  # The second sheet name
-process_retail_services_part_jobs(excel_file, sheet_name)
+url_column = "Yellow Pages Links"
+process_hardcoded_file(excel_file, url_column)
