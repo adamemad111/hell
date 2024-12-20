@@ -307,13 +307,13 @@ def save_to_csv(data, industry, job_title, sheet_name, location, file_name='outp
     except Exception as e:
         print(f"Error saving to CSV: {e}")
         
-# Function to process a single file
-def process_hardcoded_file(file_path, column_name):
+# Function to process the second sheet (Retail & Services for part jobs)
+def process_retail_services_part_jobs(file_path, sheet_name):
     print(f"Processing file: {file_path}")
 
     try:
-        # Read the file
-        data = pd.read_excel(file_path)
+        # Read the second sheet
+        data = pd.read_excel(file_path, sheet_name=sheet_name)
     except Exception as e:
         print(f"Failed to read file {file_path}: {e}")
         return
@@ -324,11 +324,12 @@ def process_hardcoded_file(file_path, column_name):
         return
 
     # Extract relevant columns
-    urls = data[column_name].dropna().tolist()[1199:1322]
-    industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[1199:1322]
-    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[1199:1322]
+    urls = data[column_name].dropna().tolist()[0:100]
+    industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[0:100]
+    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[0:100]
+    
     # Process each URL
-    for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=1200):
+    for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=1):
         print(f"Processing URL {idx}/{len(urls)}: {url}")
 
         clue_match = re.search(r'clue=([^&]*)', url)  # Extract the 'clue' value
@@ -346,8 +347,8 @@ def process_hardcoded_file(file_path, column_name):
         data = scrape_urls_async([url])  # Use your existing async scraping logic
         save_to_csv(data, industry, job_title, file_path, location, file_name=output_file)
 
-
-# Example usage
+# Example usage for Retail & Services for part jobs sheet
 excel_file = "Yellow Pages Phase 1 Links.xlsx"
-url_column = "Yellow Pages Links"
-process_hardcoded_file(excel_file, url_column)
+sheet_name = "Retail & Services for part jobs"  # The second sheet name
+process_retail_services_part_jobs(excel_file, sheet_name)
+
