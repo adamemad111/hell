@@ -324,15 +324,15 @@ print(f"Column '{column_name}' not found in file '{file_path}'.")
 return
 
 # Extract relevant columns
-    urls = data[column_name].dropna().tolist()[399:500]
-    industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[399:500]
-    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[399:500]
-    urls = data[column_name].dropna().tolist()[499:600]
-    industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[499:600]
-    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[499:600]
+    urls = data[column_name].dropna().tolist()[999:1100]
+    industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[999:1100]
+    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[999:1100]
+    urls = data[column_name].dropna().tolist()[1099:1200]
+    industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[1099:1200]
+    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[1099:1200]
 # Process each URL
-    for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=400):
-    for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=500):
+    for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=1000):
+    for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=1100):
 print(f"Processing URL {idx}/{len(urls)}: {url}")
 
 clue_match = re.search(r'clue=([^&]*)', url)  # Extract the 'clue' value
