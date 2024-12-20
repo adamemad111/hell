@@ -324,12 +324,12 @@ def process_retail_services_part_jobs(file_path, sheet_name):
         return
 
     # Extract relevant columns
-    urls = data[column_name].dropna().tolist()[0:100]
-    industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[0:100]
-    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[0:100]
+    urls = data[column_name].dropna().tolist()[1199:1322]
+    industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[1199:1322]
+    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[1199:1322]
     
     # Process each URL
-    for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=1):
+    for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=1200):
         print(f"Processing URL {idx}/{len(urls)}: {url}")
 
         clue_match = re.search(r'clue=([^&]*)', url)  # Extract the 'clue' value
@@ -351,4 +351,3 @@ def process_retail_services_part_jobs(file_path, sheet_name):
 excel_file = "Yellow Pages Phase 1 Links.xlsx"
 sheet_name = "Retail & Services for part jobs"  # The second sheet name
 process_retail_services_part_jobs(excel_file, sheet_name)
-
