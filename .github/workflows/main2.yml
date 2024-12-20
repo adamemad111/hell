@@ -28,7 +28,7 @@ jobs:
 
     - name: Run web scraper
       run: |
-        python yellow-pages.py
+        python yellow-pages.py --excel-file "${{ github.event.inputs.excel_file }}"
 
     - name: Upload output files
       uses: actions/upload-artifact@v3
