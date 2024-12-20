@@ -317,7 +317,7 @@ def process_retail_services_part_jobs(file_path, sheet_name):
     except Exception as e:
         print(f"Failed to read file {file_path}: {e}")
         return
-    column_name = "Yellow Pages Links"
+    column_name = "Yellow Pages Phase 1 Links"
     # Ensure the required column exists
     if column_name not in data.columns:
         print(f"Column '{column_name}' not found in file '{file_path}'.")
