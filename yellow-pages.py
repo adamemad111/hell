@@ -276,78 +276,87 @@ def scrape_urls_async(urls):
 import pandas as pd
 import re
 
-def save_to_csv(data, industry, job_title, sheet_name, location, file_name='output.csv'):
+
+def sanitize_filename(value):
+    return re.sub(r'[^\w\s-]', '', value).replace(' ', '_')
+
+def save_to_csv(data, category, sub_category, sheet_name, location, keyword, file_name='output.csv'):
     try:
+        # Sanitize category and sub_category to prevent directory issues
+        category = sanitize_filename(category)
+        sub_category = sanitize_filename(sub_category)
+        
         for row in data:
-            row['Industry'] = industry
-            row['Job Title'] = job_title
+            row['Category'] = category
+            row['Sub-category'] = sub_category
+            row['Suggested Keyword'] = keyword
 
         df = pd.DataFrame(data)
 
-        # Clean the 'Website' column by removing any text in parentheses
         if 'Website' in df.columns:
             df['Website'] = df['Website'].apply(lambda x: re.sub(r'\s*\(.*\)\s*', '', str(x)))
 
-        # Define the column order, ensuring Industry and Job Title are at the beginning
         column_order = [
-            'Industry', 'Job Title', 'Business Name', 'Link', 'Phone', 'Email', 'Website', 
+            'Category', 'Sub-category', 'Suggested Keyword', 'Business Name', 'Link', 'Phone', 'Email', 'Website',
             'Street', 'Suburb', 'State', 'Postcode', 'Full Location',
-            'Category', 'About Us', 'Products and Services'
+            'About Us', 'Products and Services'
         ]
 
-        # Ensure all expected columns are in the dataframe, add missing columns as empty
         for col in column_order:
             if col not in df.columns:
                 df[col] = None
 
-        # Reorder columns
         df = df[column_order]
+
+        # Regenerate file_name after sanitization
+        file_name = f"{category}+{sub_category}+{file_name.split('+')[-2]}+{file_name.split('+')[-1]}"
+
         df.to_csv(file_name, index=False, encoding='utf-8')
         print(f"Data saved to {file_name}")
     except Exception as e:
         print(f"Error saving to CSV: {e}")
 
-# Function to process a single file
-def process_hardcoded_file(file_path, column_name):
-    print(f"Processing file: {file_path}")
+# Process the specific sheet 'Retail & Services for part jobs'
+def process_sheet2(file_path, column_name='Yellow-Pages-Link', sheet_name='Retail & Services for part jobs'):
+    print(f"Processing sheet: {sheet_name} from {file_path}")
 
     try:
-        # Read the file
-        data = pd.read_excel(file_path)
+        # Read only the second sheet
+        data = pd.read_excel(file_path, sheet_name=sheet_name)
     except Exception as e:
-        print(f"Failed to read file {file_path}: {e}")
+        print(f"Failed to read sheet '{sheet_name}' from file '{file_path}': {e}")
         return
 
     # Ensure the required column exists
     if column_name not in data.columns:
-        print(f"Column '{column_name}' not found in file '{file_path}'.")
+        print(f"Column '{column_name}' not found in sheet '{sheet_name}'.")
         return
 
     # Extract relevant columns
-    urls = data[column_name].dropna().tolist()[1099:1200]
-    industries = data.get('Industry', pd.Series(['Unknown'] * len(data))).tolist()[1099:1200]
-    job_titles = data.get('Job Title', pd.Series(['Unknown'] * len(data))).tolist()[1099:1200]
+    urls = data[column_name].dropna().tolist()[11:12]
+    categories = data['Category'].tolist()[11:12]
+    sub_categories = data['Sub-category'].tolist()[11:12]
+    keywords = data['Suggested Keyword'].tolist()[11:12]
+
     # Process each URL
-    for idx, (url, industry, job_title) in enumerate(zip(urls, industries, job_titles), start=1200):
-            print(f"Processing URL {idx}/{len(urls)}: {url}")
+    for idx, (url, category, sub_category, keyword) in enumerate(zip(urls, categories, sub_categories, keywords), start=12):
+        print(f"Processing URL {idx}/{len(urls)}: {url}")
 
-            clue_match = re.search(r'clue=([^&]*)', url)  # Extract the 'clue' value
-            location_match = re.search(r'locationClue=([^&]*)', url)  # Extract the 'locationClue' value
-            clue = clue_match.group(1).replace('+', ' ') if clue_match else "Unknown_Clue"
-            location = location_match.group(1).replace('+', ' ') if location_match else "Unknown_Location"
+        clue_match = re.search(r'clue=([^&]*)', url)
+        location_match = re.search(r'locationClue=([^&]*)', url)
+        clue = clue_match.group(1).replace('+', ' ') if clue_match else "Unknown_Clue"
+        location = location_match.group(1).replace('+', ' ') if location_match else "Unknown_Location"
 
-            # Prepare sanitized output filename
-            sanitized_clue = re.sub(r'[^\w\s-]', '', clue).replace(' ', '_')[:]
-            sanitized_location = re.sub(r'[^\w\s-]', '', location).replace(' ', '_')[:30]
+        sanitized_clue = re.sub(r'[^\w\s-]', '', clue).replace(' ', '_')
+        sanitized_location = re.sub(r'[^\w\s-]', '', location).replace(' ', '_')[:30]
 
-            output_file = f"{industry}+{job_title}+{sanitized_clue}+{sanitized_location}.csv"
+        output_file = f"{category}+{sub_category}+{sanitized_clue}+{sanitized_location}.csv"
 
-            # Scrape the URL and save results
-            data = scrape_urls_async([url])  # Use your existing async scraping logic
-            save_to_csv(data, industry, job_title, file_path, location, file_name=output_file)
-
+        # Scrape the URL and save results
+        data = scrape_urls_async([url])
+        save_to_csv(data, category, sub_category, sheet_name, location, keyword, file_name=output_file)
 
 # Example usage
 excel_file = "Yellow Pages Phase 1 Links.xlsx"
-url_column = "Yellow Pages Links"
-process_hardcoded_file(excel_file, url_column)
+url_column = "Yellow-Pages-Link"
+process_sheet2(excel_file, url_column)
