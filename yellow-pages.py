@@ -333,13 +333,13 @@ def process_sheet2(file_path, column_name='Yellow-Pages-Link', sheet_name='Retai
         return
 
     # Extract relevant columns
-    urls = data[column_name].dropna().tolist()[699:750]
-    categories = data['Category'].tolist()[699:750]
-    sub_categories = data['Sub-category'].tolist()[699:750]
-    keywords = data['Suggested Keyword'].tolist()[699:750]
+    urls = data[column_name].dropna().tolist()[749:800]
+    categories = data['Category'].tolist()[749:800]
+    sub_categories = data['Sub-category'].tolist()[749:800]
+    keywords = data['Suggested Keyword'].tolist()[749:800]
 
     # Process each URL
-    for idx, (url, category, sub_category, keyword) in enumerate(zip(urls, categories, sub_categories, keywords), start=700):
+    for idx, (url, category, sub_category, keyword) in enumerate(zip(urls, categories, sub_categories, keywords), start=750):
         print(f"Processing URL {idx}/{len(urls)}: {url}")
 
         clue_match = re.search(r'clue=([^&]*)', url)
